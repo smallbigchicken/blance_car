@@ -5,7 +5,7 @@
 #include "main.h"
 #include "can_receive.h"
 #include "imu.h"
-
+#include "ws2812.h"
 
 class Communicate
 {
@@ -21,7 +21,7 @@ public:
 
 extern Imu imu;
 extern Communicate communicate;
-extern Can_receive can_receive;
+
 
 #endif
 

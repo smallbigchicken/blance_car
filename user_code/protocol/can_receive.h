@@ -18,9 +18,9 @@
 
 typedef enum
 {
-  CAN_LEFT_LEG_MOTOR_ID = 0x201, //yaw轴控制id
-  CAN_RIGHT_LEG_MOTOR_ID = 0x202, //yaw轴反馈id
-  CAN_LEGS_ALL_ID = 0x1FF,//不需要 可删去
+  CAN_LEFT_LEG_MOTOR_ID = 0x201, 
+  CAN_RIGHT_LEG_MOTOR_ID = 0x202, 
+  CAN_LEGS_ALL_ID = 0x200,
 
   DM_IMU_CAN_ID = 0x01,
   DM_IMU_MASTER_ID = 0x11,
@@ -58,7 +58,7 @@ public:
 
 
 //云台控制机构电机反馈数据结构体
-dji_motor_measure_t legs[2];
+dji_motor_measure_t* legs[2];
 dm_imu_measure_t* imu;
 
 //发送数组
@@ -91,5 +91,8 @@ fp32 uint_to_float(int x_int, fp32 x_min, fp32 x_max, int bits);
 
 
 };
+
+
+extern Can_receive can_receive;
 
 #endif

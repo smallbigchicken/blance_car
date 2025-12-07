@@ -94,7 +94,12 @@ fp32 DJI_Motor::ecd_to_angle(uint16_t ecd)
     return relative_ecd * 2 * PI / max_ecd;
 }
 
-
+void DJI_Motor::update()
+{
+    
+    this->speed = motor_measure->speed_rpm * DJI_RPM_TO_RAD;
+    this->encode_angle = ecd_to_angle(motor_measure->ecd);
+}
 
 
 

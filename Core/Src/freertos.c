@@ -161,10 +161,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of communicateTask */
   osThreadDef(communicateTask, communicate_Task, osPriorityHigh, 0, 512);
   communicateTaskHandle = osThreadCreate(osThread(communicateTask), NULL);
-  
+
   /* definition and creation of balanceTask */
-  // osThreadDef(balanceTask, balance_Task, osPriorityAboveNormal, 0, 512);
-  // balanceTaskHandle = osThreadCreate(osThread(balanceTask), NULL);
+  osThreadDef(balanceTask, balance_Task, osPriorityAboveNormal, 0, 512);
+  balanceTaskHandle = osThreadCreate(osThread(balanceTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

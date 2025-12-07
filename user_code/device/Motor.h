@@ -9,8 +9,8 @@
 #define ENCODE_ANGLE 1
 #define GYRO_ANGLE 2
 
-#define DJI_RPM_TO_RAD 0.000415809748903494517209f //2*PI/60
 
+#define DJI_RPM_TO_RAD 0.000415809748903494517209f //2*PI/60
 
 
 class Motor{
@@ -65,7 +65,7 @@ public:
 
     DJI_Motor();
 
-    DJI_Motor(const dji_motor_measure_t* motor_measure,
+    DJI_Motor(const dji_motor_measure_t* motor_ptr,
               uint16_t offset_ecd,
               uint16_t max_ecd,
               const fp32* speed_parm = NULL,

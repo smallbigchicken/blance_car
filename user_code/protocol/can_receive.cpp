@@ -1,8 +1,8 @@
 #include "can_receive.h"
-int a=0;
 
 
-
+int j=0;
+Can_receive can_receive;
 
 void Can_receive::init()
 {
@@ -33,7 +33,6 @@ void Can_receive::can_cmd_imu_request(uint16_t ID)
     imu_send_data[1] = ID>>8;
     imu_send_data[2] = 0x03;
     imu_send_data[3] = 0xCC;
-    a=sizeof(imu_send_data);
     fdcanx_send_data(&IMU_CAN, DM_IMU_REQ_ID, imu_send_data,sizeof(imu_send_data));
 }
 
@@ -43,13 +42,11 @@ void Can_receive::can_cmd_imu_request(uint16_t ID)
  */
 void Can_receive::get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t data[8])
 {
-
     dji_motor->last_ecd = dji_motor->ecd;
     dji_motor->ecd = (uint16_t)(data[0] << 8 | data[1]);
     dji_motor->speed_rpm = (uint16_t)(data[2] << 8 | data[3]);
     dji_motor->given_current = (uint16_t)(data[4] << 8 | data[5]);
     dji_motor->temperate = data[6];
-
 }
 
 void Can_receive::get_dm_imu_measure(dm_imu_measure_t * imu, uint8_t data[8])
@@ -85,7 +82,7 @@ fp32 Can_receive::uint_to_float(int x_int, fp32 x_min, fp32 x_max, int bits)
 
 const dji_motor_measure_t *Can_receive::get_dji_motor_measure_point(uint8_t i)
 {
-   return &legs[i];
+   return legs[i];
 }
 
 const dm_imu_measure_t *Can_receive::get_dm_imu_measure_point()

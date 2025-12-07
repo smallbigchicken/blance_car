@@ -1,7 +1,7 @@
 #include "communicate.h"
 
+int i=0;
 
-Can_receive can_receive;
 Communicate communicate;
 Imu imu(can_receive.get_dm_imu_measure_point());
 
@@ -48,7 +48,13 @@ void fdcan1_rx_callback(void)
 	id1=fdcanx_receive(&hfdcan1, rx_data1);
 	switch (id1)
 	{
-
+	case CAN_LEFT_LEG_MOTOR_ID:
+		can_receive.get_dji_motor_measure(can_receive.legs[0],rx_data1);
+		//WS2812_Ctrl(0,0,0);
+		break;
+	case CAN_RIGHT_LEG_MOTOR_ID:
+		can_receive.get_dji_motor_measure(can_receive.legs[1],rx_data1);
+		break;
 	default:
 		break;
 	}

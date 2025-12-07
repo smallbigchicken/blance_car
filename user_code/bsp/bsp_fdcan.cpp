@@ -90,7 +90,7 @@ uint8_t fdcanx_send_data(FDCAN_HandleTypeDef *hfdcan, uint16_t id, uint8_t *data
 * @details:    	接收数据
 ************************************************************************
 **/
-uint8_t fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint8_t *buf)
+uint16_t fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint8_t *buf)
 {	
  
 	FDCAN_RxHeaderTypeDef fdcan_RxHeader;

@@ -1,25 +1,25 @@
-// #ifndef GIMBAL_TASK_H
-// #define GIMBAL_TASK_H
+#ifndef GIMBAL_TASK_H
+#define GIMBAL_TASK_H
 
-// #include "main.h"
-// #include "cmsis_os.h"
-// #include "car.h"
-
-
-// #define GIMBAL_TASK_INIT_TIME 201
-
-// #define GIMBAL_CONTROL_TIME_MS 2
+#include "main.h"
+#include "cmsis_os.h"
+#include "car.h"
 
 
+#define GIMBAL_TASK_INIT_TIME 201
 
-// #ifdef __cplusplus
-// extern "C" {
-
-// extern void balance_task(void *pvParameters);
+#define GIMBAL_CONTROL_TIME_MS 2
 
 
-// }
-// #endif
+
+#ifdef __cplusplus
+extern "C" {
+
+extern void balance_Task(void *pvParameters);
 
 
-// #endif 
+}
+#endif
+
+
+#endif 
