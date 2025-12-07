@@ -1,36 +1,53 @@
+#ifndef CAR_H
+#define CAR_H
+
+#include "pid.h"
+#include "imu.h"
 #include "motor.h"
 #include "can_receive.h"
 
-
-
-typedef enum
-{
-    CAR_STOP = 0,//无力
-    CAR_RUN        //归中
-} car_mode_e;
-
-
-
-
 class Car {
 public:
+    Car();
 
+    // 硬件绑定与初始化
+    void init(DJI_Motor* l_ptr, DJI_Motor* r_ptr, Imu* imu_ptr);
+    void pid_init(PidParam upright, PidParam speed, PidParam turn);
 
-    DJI_Motor left_leg;
-    DJI_Motor right_leg;
-    uint16_t car_mode;
-    Car(const dji_motor_measure_t* left_motor_ptr,
-        const dji_motor_measure_t* right_motor_ptr,
-        uint16_t offset_ecd,
-        uint16_t max_ecd,
-        const fp32* speed_parm = NULL,
-        const fp32* encode_parm = NULL, 
-        const fp32* gyro_parm  = NULL);
+    // --- 核心任务流函数 ---
+    void feedback_update(); // 1. 读取传感器
+    void set_control();     // 2. 设定目标 (来自遥控器)
+    void solve();           // 3. PID 计算
+    void output();          // 4. 发送电流给电机
 
-    void feedback_update();
-    void set_control();
-    void solve();  // 核心计算
-    void output(); // 发送电流
+private:
+    // 硬件指针
+    DJI_Motor* motor_l;
+    DJI_Motor* motor_r;
+    Imu* imu;
+
+    // PID 对象
+    Pid pid_upright;
+    Pid pid_speed;
+    Pid pid_turn;
+
+    // 状态量
+    fp32 current_pitch;
+    fp32 current_speed;
+    fp32 current_yaw_rate;
+
+    // 目标量
+    fp32 target_speed;
+    fp32 target_turn;
+    
+    // 中间计算量
+    fp32 target_pitch_angle; // 速度环算出的目标角度
+
+    // 标志位
+    bool stop_mode;          // 倒地保护标志
+    const fp32 STOP_ANGLE = 40.0f; // 倒地阈值
 };
 
-extern Car car;
+extern Car car; // 声明全局对象
+
+#endif

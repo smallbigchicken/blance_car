@@ -45,11 +45,13 @@ typedef struct
 #define ROLL_CAN_MIN    (-180.0f)
 #define YAW_CAN_MAX     (180.0f)
 #define YAW_CAN_MIN     (-180.0f)
-
+#define GYRO_CAN_MAX	(34.88f)
+#define GYRO_CAN_MIN	(-34.88f)
 
 typedef struct
 {
   int pitch, roll, yaw;
+  int x_gyro,y_gyro,z_gyro;
 } dm_imu_measure_t;
 
 

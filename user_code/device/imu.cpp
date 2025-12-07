@@ -15,6 +15,10 @@ void Imu::update()
 	euler[1]=imu_measure->yaw;
 	euler[2]=imu_measure->roll;
 
+    gyro[0]=imu_measure->x_gyro;
+	gyro[1]=imu_measure->y_gyro;
+	gyro[2]=imu_measure->z_gyro;
+
 }
 
 

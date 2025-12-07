@@ -26,12 +26,22 @@ void Can_receive::can_cmd_leg_motor(int16_t left_leg, int16_t right_leg,uint16_t
 
 
 
-void Can_receive::can_cmd_imu_request(uint16_t ID)
+void Can_receive::can_cmd_imu_request_euler(uint16_t ID)
 {
 
     imu_send_data[0] = ID;
     imu_send_data[1] = ID>>8;
     imu_send_data[2] = 0x03;
+    imu_send_data[3] = 0xCC;
+    fdcanx_send_data(&IMU_CAN, DM_IMU_REQ_ID, imu_send_data,sizeof(imu_send_data));
+}
+
+void Can_receive::can_cmd_imu_request_gyro(uint16_t ID)
+{
+
+    imu_send_data[0] = ID;
+    imu_send_data[1] = ID>>8;
+    imu_send_data[2] = 0x02;
     imu_send_data[3] = 0xCC;
     fdcanx_send_data(&IMU_CAN, DM_IMU_REQ_ID, imu_send_data,sizeof(imu_send_data));
 }
@@ -51,9 +61,24 @@ void Can_receive::get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t 
 
 void Can_receive::get_dm_imu_measure(dm_imu_measure_t * imu, uint8_t data[8])
 {
-    imu->pitch=uint_to_float(int(data[2]|(data[3]<<8)),PITCH_CAN_MIN,PITCH_CAN_MAX,16);
-	imu->yaw=uint_to_float(int(data[4]|(data[5]<<8)),YAW_CAN_MIN,YAW_CAN_MAX,16);
-	imu->roll=uint_to_float(int(data[6]|(data[7]<<8)),ROLL_CAN_MIN,ROLL_CAN_MAX,16);
+    switch (data[0])
+    {
+    case 2:
+        imu->x_gyro=uint_to_float(int(data[2]|(data[3]<<8)),GYRO_CAN_MIN,GYRO_CAN_MAX,16);
+	    imu->y_gyro=uint_to_float(int(data[4]|(data[5]<<8)),GYRO_CAN_MIN,GYRO_CAN_MAX,16);
+	    imu->z_gyro=uint_to_float(int(data[6]|(data[7]<<8)),GYRO_CAN_MIN,GYRO_CAN_MAX,16);
+        break;
+    case 3:
+        imu->pitch=uint_to_float(int(data[2]|(data[3]<<8)),PITCH_CAN_MIN,PITCH_CAN_MAX,16);
+        imu->yaw=uint_to_float(int(data[4]|(data[5]<<8)),YAW_CAN_MIN,YAW_CAN_MAX,16);
+        imu->roll=uint_to_float(int(data[6]|(data[7]<<8)),ROLL_CAN_MIN,ROLL_CAN_MAX,16);
+        break;
+    default:
+        break;
+    }
+
+
+    
 }
 
 
