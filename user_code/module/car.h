@@ -9,10 +9,10 @@
 class Car {
 public:
     Car();
+    Car(const dji_motor_measure_t* left_ptr,const dji_motor_measure_t* right_ptr,const dm_imu_measure_t* imu_ptr,
+        const PidParam &pid_upright,const PidParam &pid_speed,const PidParam &pid_turn);
 
-    // 硬件绑定与初始化
-    void init(DJI_Motor* l_ptr, DJI_Motor* r_ptr, Imu* imu_ptr);
-    void pid_init(PidParam upright, PidParam speed, PidParam turn);
+
 
     // --- 核心任务流函数 ---
     void feedback_update(); // 1. 读取传感器
@@ -22,9 +22,9 @@ public:
 
 private:
     // 硬件指针
-    DJI_Motor* motor_l;
-    DJI_Motor* motor_r;
-    Imu* imu;
+    DJI_Motor left_leg;
+    DJI_Motor right_leg;
+    Imu imu;
 
     // PID 对象
     Pid pid_upright;
@@ -49,5 +49,4 @@ private:
 };
 
 extern Car car; // 声明全局对象
-
 #endif

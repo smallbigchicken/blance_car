@@ -8,32 +8,25 @@
 void balance_Task(void *pvParameters)
 {
    
-    vTaskDelay(500); 
-
-   
-    car.init(&motor_left, &motor_right, &imu_data);
-    car.pid_init(PID_UPRIGHT, PID_SPEED, PID_TURN);
+    vTaskDelay(GIMBAL_TASK_INIT_TIME);
 
 
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency = pdMS_TO_TICKS(GIMBAL_CONTROL_TIME_MS);
 
-    // 4. 进入死循环控制
     while (1)
     {
  
         car.feedback_update();
 
 
-        car.set_control();
+        //car.set_control();
 
      
-        car.solve();
+        //car.solve();
 
 
-        car.output();
+        //car.output();
 
 
-        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+        vTaskDelay(GIMBAL_CONTROL_TIME_MS);
     }
 }

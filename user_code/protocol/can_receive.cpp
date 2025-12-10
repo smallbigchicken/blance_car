@@ -1,7 +1,5 @@
 #include "can_receive.h"
 
-
-int j=0;
 Can_receive can_receive;
 
 void Can_receive::init()
@@ -46,10 +44,7 @@ void Can_receive::can_cmd_imu_request_gyro(uint16_t ID)
     fdcanx_send_data(&IMU_CAN, DM_IMU_REQ_ID, imu_send_data,sizeof(imu_send_data));
 }
 
-/**
- * @brief          DJI电机电流接收(云台上为摩擦轮电机和拨弹轮电机)
- * @param[out]     dji_motor: 指向电机数据的指针
- */
+
 void Can_receive::get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t data[8])
 {
     dji_motor->last_ecd = dji_motor->ecd;

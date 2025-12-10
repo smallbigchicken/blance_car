@@ -1,9 +1,8 @@
 #include "communicate.h"
 
-int i=0;
+int tickt=0;
 
 Communicate communicate;
-Imu imu(can_receive.get_dm_imu_measure_point());
 
 
 void Communicate::init()
@@ -12,9 +11,10 @@ void Communicate::init()
 }
 
 void Communicate::run()
-{
-	can_receive.can_cmd_imu_request(DM_IMU_CAN_ID);
-	imu.update();
+{	
+	if(tickt) can_receive.can_cmd_imu_request_gyro(DM_IMU_CAN_ID);
+	else  can_receive.can_cmd_imu_request_euler(DM_IMU_CAN_ID);
+	tickt=!tickt;
 }
 
 

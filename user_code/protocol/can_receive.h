@@ -50,8 +50,8 @@ typedef struct
 
 typedef struct
 {
-  int pitch, roll, yaw;
-  int x_gyro,y_gyro,z_gyro;
+  fp32 pitch, roll, yaw;
+  fp32 x_gyro,y_gyro,z_gyro;
 } dm_imu_measure_t;
 
 
@@ -81,7 +81,8 @@ void get_dm_imu_measure(dm_imu_measure_t *imu, uint8_t data[8]);
 
 //发送
 void can_cmd_leg_motor(int16_t left_leg, int16_t right_leg,uint16_t ID);
-void can_cmd_imu_request(uint16_t ID);
+void can_cmd_imu_request_euler(uint16_t ID);
+void can_cmd_imu_request_gyro(uint16_t ID);
 
 
 

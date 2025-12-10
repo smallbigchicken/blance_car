@@ -10,6 +10,7 @@
 class Communicate
 {
 public:
+    
     void init();
 
     void run();
@@ -19,7 +20,6 @@ public:
 
 
 
-extern Imu imu;
 extern Communicate communicate;
 
 

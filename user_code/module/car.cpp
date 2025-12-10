@@ -1,66 +1,62 @@
 #include "Car.h"
 #include "main.h" // 包含 CAN 发送函数的头文件
 
-DJI_Motor motor_left;
-DJI_Motor motor_right;
-Imu imu_data;
 
 
 
-Car car;
+
+
 
 
 const PidParam PID_UPRIGHT = {
-    .kp = 600.0f,  
-    .ki = 0.0f,    // 绝对不要给 Ki
-    .kd = 18.0f,   // 必须给 Kd，否则震荡
-    .kf = 0.0f,
-    .max_iout = 0,
-    .max_out = 10000 // 电机最大电流 (16384满)
+    600.0f,  
+    0.0f,    // 绝对不要给 Ki
+    18.0f,   // 必须给 Kd，否则震荡
+    0,
+    10000 // 电机最大电流 (16384满)
 };
 
 
 const PidParam PID_SPEED = {
-    .kp = -2.5f,   // 负号取决于电机安装方向，需调试
-    .ki = -0.02f,  
-    .kd = 0.0f,    // 速度环一般不用 D
-    .kf = 0.0f,
-    .max_iout = 500,
-    .max_out = 15.0f // 限制最大倾角 (例如 15度)，防止加速过猛倒地
+    -2.5f,   // 负号取决于电机安装方向，需调试
+    -0.02f,  
+    0.0f,    // 速度环一般不用 D
+    500,
+    15.0f // 限制最大倾角 (例如 15度)，防止加速过猛倒地
 };
 
 const PidParam PID_TURN = {
-    .kp = 6.0f,
-    .ki = 0.0f,
-    .kd = 0.5f,
-    .kf = 0.0f,
-    .max_iout = 0,
-    .max_out = 4000
+    6.0f,
+    0.0f,
+    0.5f,
+    0,
+    4000
 };
 
 
-Car::Car() : stop_mode(true) {}
+Car car(can_receive.get_dji_motor_measure_point(0),can_receive.get_dji_motor_measure_point(1),can_receive.get_dm_imu_measure_point(),PID_UPRIGHT,PID_SPEED,PID_TURN);
 
-void Car::init(DJI_Motor* l_ptr, DJI_Motor* r_ptr, Imu* imu_ptr) {
-    motor_l = l_ptr;
-    motor_r = r_ptr;
-    imu = imu_ptr;
+
+
+Car::Car(const dji_motor_measure_t *left_ptr, const dji_motor_measure_t *right_ptr, const dm_imu_measure_t *imu_ptr, 
+    const PidParam &pid_upright, const PidParam &pid_speed, const PidParam &pid_turn):
+    left_leg(left_ptr),right_leg(right_ptr),imu(imu_ptr),pid_upright(PID_POSITION,pid_upright),pid_speed(PID_POSITION,pid_speed),pid_turn(PID_ANGLE,pid_turn),
+    stop_mode(0)
+{
+
 }
 
-void Car::pid_init(PidParam upright, PidParam speed, PidParam turn) {
-    pid_upright = Pid(PID_POSITION, upright);
-    pid_speed   = Pid(PID_POSITION, speed);
-    pid_turn    = Pid(PID_POSITION, turn); // 假设控制的是角速度
-}
+
+
 
 // 1. 数据反馈更新
 void Car::feedback_update() {
-    
-    current_pitch = imu->euler[0]; // 假设 [1] 是 Pitch
-    current_yaw_rate = imu->imu_measure->gyro_z; // Z轴角速度
+    imu.update();
+    current_pitch = imu.euler[0];
+    current_yaw_rate = imu.gyro[2]; // Z轴角速度
     
     // 计算平均速度 (RPM 或 m/s，需与PID参数匹配)
-    current_speed = (motor_l->speed_rpm + motor_r->speed_rpm) / 2.0f;
+    current_speed = (left_leg.speed_rpm + right_leg.speed_rpm) / 2.0f;
 
     // 倒地检测
     if (std::abs(current_pitch) > STOP_ANGLE) {
@@ -92,8 +88,8 @@ void Car::solve() {
         pid_speed.Reset();
         pid_turn.Reset();
         
-        motor_l->current_give = 0;
-        motor_r->current_give = 0;
+        left_leg.current_give = 0;
+        right_leg.current_give = 0;
         return;
     }
 
@@ -115,18 +111,19 @@ void Car::solve() {
     fp32 final_r = out_balance - out_turn;
 
     // 赋值给电机对象 (注意类型转换)
-    motor_l->current_give = (int16_t)final_l;
-    motor_r->current_give = (int16_t)final_r;
+    left_leg.current_give = (int16_t)final_l;
+    right_leg.current_give = (int16_t)final_r;
 }
 
 // 4. 硬件输出
 void Car::output() {
     
     if (stop_mode) {
-        motor_l->current_give = 0;
-        motor_r->current_give = 0;
+        left_leg.current_give = 0;
+        right_leg.current_give = 0;
     }
     
     
-    can_receive.can_cmd_leg_motor(motor_l->current_give, motor_r->current_give,CAN_LEGS_ALL_ID);
+    // can_receive.can_cmd_leg_motor(left_leg.current_give, right_leg.current_give,CAN_LEGS_ALL_ID);
+    can_receive.can_cmd_leg_motor(0, 0,CAN_LEGS_ALL_ID);
 }

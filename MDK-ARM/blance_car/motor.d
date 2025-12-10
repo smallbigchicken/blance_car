@@ -1,9 +1,5 @@
 blance_car\motor.o: ..\user_code\device\Motor.cpp
-blance_car\motor.o: ..\user_code\device\Motor.h
-blance_car\motor.o: ..\user_code\algorithm\Pid.h
-blance_car\motor.o: ..\user_code\componet\include\struct_typedef.h
-blance_car\motor.o: ..\user_code\componet\support\user_lib.h
-blance_car\motor.o: ..\user_code\protocol\Can_receive.h
+blance_car\motor.o: ..\user_code\device\motor.h
 blance_car\motor.o: ../Core/Inc/main.h
 blance_car\motor.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h
 blance_car\motor.o: ../Core/Inc/stm32h7xx_hal_conf.h
@@ -51,6 +47,7 @@ blance_car\motor.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 blance_car\motor.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h
 blance_car\motor.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h
 blance_car\motor.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h
+blance_car\motor.o: ..\user_code\protocol\Can_receive.h
 blance_car\motor.o: ../Core/Inc/fdcan.h
 blance_car\motor.o: ..\user_code\bsp\ws2812.h
 blance_car\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -68,3 +65,4 @@ blance_car\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 blance_car\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 blance_car\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 blance_car\motor.o: ..\user_code\bsp\bsp_fdcan.h
+blance_car\motor.o: ..\user_code\componet\include\struct_typedef.h

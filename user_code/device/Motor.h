@@ -19,7 +19,7 @@ public:
 
    
     Motor();
-    virtual void update() = 0;
+    void update();
 };
 
 class DJI_Motor : public Motor
@@ -42,8 +42,8 @@ public:
               uint16_t offset_ecd = 0,
               uint16_t max_ecd = 8191);
 
-   
-    void update() override; 
+        
+    void update();
 };
 
 #endif
