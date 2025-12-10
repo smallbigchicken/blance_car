@@ -1,8 +1,7 @@
 #ifndef MOTOR_H
 #define MOTOR_H
-
-#include "main.h"       
-#include "Can_receive.h" 
+       
+#include "can_receive.h" 
 
 
 class Motor {

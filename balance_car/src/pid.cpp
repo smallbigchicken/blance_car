@@ -1,4 +1,4 @@
-#include "Pid.h"
+#include "pid.h"
 
 Pid::Pid(PidMode mode_, const PidParam &param_) 
     : mode(mode_), param(param_) 
@@ -23,26 +23,21 @@ fp32 Pid::Calc(fp32 current, fp32 target)
         error = AngleFormat(error);
     }
 
-    // 3. 积分项 (I)
-    // 平衡小车直立环通常 Ki = 0，速度环需要 Ki
+
     i_out += param.ki * error;
     Limit(i_out, param.max_iout);
 
-    // 4. 微分项 (D)
-    // 包含了对噪声的直接放大，直立环 kd 很关键
+
     fp32 d_out = param.kd * (error - last_error);
 
-    // 5. 前馈项 (F)
-    // 基于目标的预期输出。例如目标速度越大，预先给的电压就越大。
-    fp32 f_out = param.kf * target;
 
-    // 6. 比例项 (P)
+
     fp32 p_out = param.kp * error;
 
-    // 7. 总计算
-    fp32 total_out = p_out + i_out + d_out + f_out;
+    
+    fp32 total_out = p_out + i_out + d_out;
     Limit(total_out, param.max_out);
-
+    param.out=total_out;
     // 8. 记录历史
     last_error = error;
 

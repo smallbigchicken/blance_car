@@ -14,14 +14,14 @@ struct PidParam {
     fp32 kp;
     fp32 ki;
     fp32 kd;
-    fp32 kf;         // 前馈系数
     fp32 max_iout;   // 积分上限
     fp32 max_out;    // 总输出上限
+    fp32 out;
 };
 
 class Pid {
 public:
-    Pid() = default;
+    Pid();
     
     // 构造函数
     Pid(PidMode mode, const PidParam &param);

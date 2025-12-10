@@ -1,9 +1,8 @@
 #include "motor.h"
 #include <math.h> // for PI
 
-#ifndef PI
 #define PI 3.1415926535f
-#endif
+
 
 
 Motor::Motor() {
