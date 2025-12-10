@@ -43,7 +43,6 @@ DJI_Motor::DJI_Motor(const dji_motor_measure_t* measure_ptr,
 
 void DJI_Motor::update()
 {
-    if (motor_measure == NULL) return;
 
     
     uint16_t now_ecd = motor_measure->ecd;

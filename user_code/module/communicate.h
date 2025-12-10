@@ -6,6 +6,7 @@
 #include "can_receive.h"
 #include "imu.h"
 #include "ws2812.h"
+#include "DT7.h"
 
 class Communicate
 {

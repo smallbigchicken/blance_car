@@ -5,12 +5,14 @@
 #include "imu.h"
 #include "motor.h"
 #include "can_receive.h"
+#include "DT7.h"
+
 
 class Car {
 public:
     Car();
     Car(const dji_motor_measure_t* left_ptr,const dji_motor_measure_t* right_ptr,const dm_imu_measure_t* imu_ptr,
-        const PidParam &pid_upright,const PidParam &pid_speed,const PidParam &pid_turn);
+        const PidParam &pid_upright,const PidParam &pid_speed,const PidParam &pid_turn,const RC_ctrl_t *gimbal_RC);
 
 
 
@@ -21,7 +23,10 @@ public:
     void output();          // 4. 发送电流给电机
 
 private:
-    // 硬件指针
+        
+
+    const RC_ctrl_t *RC; //云台使用的遥控器指针
+
     DJI_Motor left_leg;
     DJI_Motor right_leg;
     Imu imu;

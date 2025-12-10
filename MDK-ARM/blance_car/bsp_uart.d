@@ -48,4 +48,4 @@ blance_car\bsp_uart.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex
 blance_car\bsp_uart.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h
 blance_car\bsp_uart.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h
 blance_car\bsp_uart.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h
-blance_car\bsp_uart.o: ..\user_code\componet\include\struct_typedef.h
+blance_car\bsp_uart.o: ../user_code/componet/include/struct_typedef.h

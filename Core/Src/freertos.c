@@ -22,7 +22,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "communicate_task.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -139,24 +139,24 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  // osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  // defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  // /* definition and creation of KeyTask */
-  // osThreadStaticDef(KeyTask, KeyTask_Entry, osPriorityRealtime, 0, 128, KeyTaskBuffer, &KeyTaskControlBlock);
-  // KeyTaskHandle = osThreadCreate(osThread(KeyTask), NULL);
+  /* definition and creation of KeyTask */
+  osThreadStaticDef(KeyTask, KeyTask_Entry, osPriorityRealtime, 0, 128, KeyTaskBuffer, &KeyTaskControlBlock);
+  KeyTaskHandle = osThreadCreate(osThread(KeyTask), NULL);
 
-  // /* definition and creation of LcdTask */
-  // osThreadStaticDef(LcdTask, LcdTask_Entry, osPriorityNormal, 0, 256, LcdTaskBuffer, &LcdTaskControlBlock);
-  // LcdTaskHandle = osThreadCreate(osThread(LcdTask), NULL);
+  /* definition and creation of LcdTask */
+  osThreadStaticDef(LcdTask, LcdTask_Entry, osPriorityNormal, 0, 256, LcdTaskBuffer, &LcdTaskControlBlock);
+  LcdTaskHandle = osThreadCreate(osThread(LcdTask), NULL);
 
-  // /* definition and creation of ImuTask */
-  // osThreadStaticDef(ImuTask, ImuTask_Entry, osPriorityHigh, 0, 1024, ImuTaskBuffer, &ImuTaskControlBlock);
-  // ImuTaskHandle = osThreadCreate(osThread(ImuTask), NULL);
+  /* definition and creation of ImuTask */
+  osThreadStaticDef(ImuTask, ImuTask_Entry, osPriorityHigh, 0, 1024, ImuTaskBuffer, &ImuTaskControlBlock);
+  ImuTaskHandle = osThreadCreate(osThread(ImuTask), NULL);
 
-  // /* definition and creation of FunTest */
-  // osThreadStaticDef(FunTest, FunTest_Entry, osPriorityBelowNormal, 0, 128, FunTestBuffer, &FunTestControlBlock);
-  // FunTestHandle = osThreadCreate(osThread(FunTest), NULL);
+  /* definition and creation of FunTest */
+  osThreadStaticDef(FunTest, FunTest_Entry, osPriorityBelowNormal, 0, 128, FunTestBuffer, &FunTestControlBlock);
+  FunTestHandle = osThreadCreate(osThread(FunTest), NULL);
 
   /* definition and creation of communicateTask */
   osThreadDef(communicateTask, communicate_Task, osPriorityHigh, 0, 512);

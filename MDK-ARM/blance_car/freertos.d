@@ -60,5 +60,3 @@ blance_car\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers
 blance_car\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 blance_car\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 blance_car\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-blance_car\freertos.o: ..\user_code\application\communicate_task.h
-blance_car\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

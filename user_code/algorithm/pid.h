@@ -16,6 +16,7 @@ struct PidParam {
     fp32 kd;
     fp32 max_iout;   // 积分上限
     fp32 max_out;    // 总输出上限
+    fp32 out;
 };
 
 class Pid {

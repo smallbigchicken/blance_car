@@ -50,8 +50,8 @@ blance_car\imu.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h
 blance_car\imu.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h
 blance_car\imu.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h
 blance_car\imu.o: ../Core/Inc/fdcan.h
-blance_car\imu.o: ..\user_code\protocol\can_receive.h
-blance_car\imu.o: ..\user_code\bsp\ws2812.h
+blance_car\imu.o: ../user_code/protocol/can_receive.h
+blance_car\imu.o: ../user_code/bsp/ws2812.h
 blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 blance_car\imu.o: ../Core/Inc/FreeRTOSConfig.h
@@ -66,5 +66,5 @@ blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 blance_car\imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-blance_car\imu.o: ..\user_code\bsp\bsp_fdcan.h
-blance_car\imu.o: ..\user_code\componet\include\struct_typedef.h
+blance_car\imu.o: ../user_code/bsp/bsp_fdcan.h
+blance_car\imu.o: ../user_code/componet/include/struct_typedef.h

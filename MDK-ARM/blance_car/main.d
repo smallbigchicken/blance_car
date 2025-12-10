@@ -63,6 +63,7 @@ blance_car\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_grou
 blance_car\main.o: ../Core/Inc/adc.h
 blance_car\main.o: ../Core/Inc/dma.h
 blance_car\main.o: ../Core/Inc/fdcan.h
+blance_car\main.o: ../Core/Inc/memorymap.h
 blance_car\main.o: ../Core/Inc/octospi.h
 blance_car\main.o: ../Core/Inc/spi.h
 blance_car\main.o: ../Core/Inc/tim.h

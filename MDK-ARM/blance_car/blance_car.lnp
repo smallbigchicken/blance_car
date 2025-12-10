@@ -6,6 +6,7 @@
 "blance_car\adc.o"
 "blance_car\dma.o"
 "blance_car\fdcan.o"
+"blance_car\memorymap.o"
 "blance_car\octospi.o"
 "blance_car\spi.o"
 "blance_car\tim.o"
@@ -75,6 +76,7 @@
 "blance_car\imu.o"
 "blance_car\motor.o"
 "blance_car\user_lib.o"
+"blance_car\dt7.o"
 --strict --scatter "blance_car\blance_car.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

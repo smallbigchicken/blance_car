@@ -50,8 +50,8 @@ typedef struct
 
 typedef struct
 {
-  fp32 pitch, roll, yaw;
-  fp32 x_gyro,y_gyro,z_gyro;
+  float pitch, yaw, roll;
+  float x_gyro,y_gyro,z_gyro;
 } dm_imu_measure_t;
 
 
@@ -60,8 +60,8 @@ public:
 
 
 //云台控制机构电机反馈数据结构体
-dji_motor_measure_t* legs[2];
-dm_imu_measure_t* imu;
+dji_motor_measure_t legs[2];
+dm_imu_measure_t imu;
 
 //发送数组
 uint8_t legs_send_data[8];

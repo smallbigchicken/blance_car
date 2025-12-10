@@ -18,13 +18,13 @@ void balance_Task(void *pvParameters)
         car.feedback_update();
 
 
-        //car.set_control();
+        car.set_control();
 
      
-        //car.solve();
+        car.solve();
 
 
-        //car.output();
+        car.output();
 
 
         vTaskDelay(GIMBAL_CONTROL_TIME_MS);

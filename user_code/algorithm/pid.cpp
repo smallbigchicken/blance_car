@@ -37,7 +37,7 @@ fp32 Pid::Calc(fp32 current, fp32 target)
     
     fp32 total_out = p_out + i_out + d_out;
     Limit(total_out, param.max_out);
-
+    param.out=total_out;
     // 8. 记录历史
     last_error = error;
 
