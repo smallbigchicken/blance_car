@@ -1,19 +1,66 @@
-# 一般可执行文件
-/**/*.exe
+# ==========================
+# 1. CMake 构建目录与生成文件
+# ==========================
+# 忽略通常用于编译的 build 文件夹（最重要）
+build/
+Build/
+cmake-build-debug/
+cmake-build-release/
 
-# Keil-DefaultCompiler工程忽略项
-/**/MDK-ARM/*
-# 不忽略Keil工程配置文件
-!/**/MDK-ARM/*.uvoptx
-!/**/MDK-ARM/*.uvprojx
-!/**/MDK-ARM/startup_*.s
+# 如果你在根目录直接运行了 cmake (不推荐)，这些文件需要忽略
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+*.cmake
 
-# armgcc-cmake工程忽略项
-/**/cmake-build-debug
+# ==========================
+# 2. 编译产生的二进制文件
+# ==========================
+# 所有的库文件
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
 
-# VsCode编辑器忽略项
-/**/.vscode
-/**/workspace.code-workspace
+# 所有的目标文件 (Object files)
+*.o
+*.obj
 
-# Clion编辑器忽略项
-/**/.idea
+# 所有的可执行文件 (Linux 下通常没有后缀，建议统一输出到 build 目录)
+# 如果你的程序有特定后缀，可以在这里添加，例如 *.exe, *.out
+*.exe
+*.out
+*.app
+
+# ==========================
+# 3. 编辑器与 IDE 配置文件
+# ==========================
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# CLion (JetBrains)
+.idea/
+cmake-build-*/
+
+# Vim / Emacs 临时文件
+*~
+*.swp
+\#*#
+
+# ==========================
+# 4. 操作系统生成文件
+# ==========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
