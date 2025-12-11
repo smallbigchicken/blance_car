@@ -6,7 +6,7 @@
 Car::Car(const dji_motor_measure_t *left_ptr, const dji_motor_measure_t *right_ptr, 
     const PidParam &pid_upright, const PidParam &pid_speed, const PidParam &pid_turn):
     left_leg(left_ptr),right_leg(right_ptr),pid_upright(PID_POSITION,pid_upright),pid_speed(PID_POSITION,pid_speed),pid_turn(PID_ANGLE,pid_turn),
-    stop_mode(0)
+    stop_mode(1)
 {
 
 }

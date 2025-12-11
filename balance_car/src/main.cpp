@@ -8,9 +8,9 @@ using namespace std::chrono;
 using namespace std::this_thread;
 
 // ================= 配置参数 =================
-#define COMMUNICATE_TASK_INIT_TIME  30
-#define COMMUNICATE_CONTROL_TIME_MS 2
-#define BALANCE_CAR_TASK_INIT_TIME_MS   200
+#define COMMUNICATE_TASK_INIT_TIME       30
+#define COMMUNICATE_CONTROL_TIME_MS      2
+#define BALANCE_CAR_TASK_INIT_TIME_MS    200
 #define BALANCE_CAR_CONTROL_TIME_MS      2
 
 const PidParam PID_UPRIGHT = {
@@ -96,7 +96,7 @@ int main()
 
 
     // 1. 初始化 CAN
-    if (!can_receive.init("can0")) {
+    if (!can_receive.init("/dev/ttyACM0")) {
         return -1;
     }
 
