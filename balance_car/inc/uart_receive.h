@@ -9,7 +9,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-
+#define PI 3.1415926
 typedef struct
 {
     float roll;      // 横滚角 (deg)
@@ -51,6 +51,6 @@ private:
 };
 
 // 声明外部单例 (如果你想像 Can_receive 那样全局使用)
-extern Uart_receive Uart_receive;
+extern Uart_receive uart_receive;
 
 #endif

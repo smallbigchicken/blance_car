@@ -3,9 +3,9 @@
 
 
 
-Car::Car(const dji_motor_measure_t *left_ptr, const dji_motor_measure_t *right_ptr, 
+Car::Car(const dji_motor_measure_t *left_ptr, const dji_motor_measure_t *right_ptr, const dm_imu_measure_t* imu_ptr,
     const PidParam &pid_upright, const PidParam &pid_speed, const PidParam &pid_turn):
-    left_leg(left_ptr),right_leg(right_ptr),pid_upright(PID_POSITION,pid_upright),pid_speed(PID_POSITION,pid_speed),pid_turn(PID_ANGLE,pid_turn),
+    left_leg(left_ptr),right_leg(right_ptr),imu(imu_ptr),pid_upright(PID_POSITION,pid_upright),pid_speed(PID_POSITION,pid_speed),pid_turn(PID_ANGLE,pid_turn),
     stop_mode(1)
 {
 
@@ -17,7 +17,7 @@ Car::Car(const dji_motor_measure_t *left_ptr, const dji_motor_measure_t *right_p
 // 1. 数据反馈更新
 void Car::feedback_update() {
 
-
+    imu.update();
     left_leg.update();
     right_leg.update();
 
@@ -31,6 +31,8 @@ void Car::feedback_update() {
     // } else {
     //     stop_mode = false;
     // }
+    std::cout<<"当前模式:"<<stop_mode<<std::endl;
+    std::cout<<"当前pitch:"<<imu.euler[0]<<std::endl;
 }
 
 // 2. 设定控制目标

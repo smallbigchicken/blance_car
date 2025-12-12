@@ -46,8 +46,8 @@ bool Uart_receive::configure_serial() {
     }
 
     // 设置波特率 115200
-    cfsetispeed(&options, B115200);
-    cfsetospeed(&options, B115200);
+    cfsetispeed(&options, B921600);
+    cfsetospeed(&options, B921600);
 
     // 8N1 模式
     options.c_cflag &= ~PARENB; // 无校验
@@ -75,79 +75,84 @@ bool Uart_receive::configure_serial() {
     }
     return true;
 }
+// 辅助函数：确保一定读够 len 个字节
+// 因为 read(fd, buf, 17) 并不保证一次就能返回 17 个字节，可能只返回 5 个
+// 所以必须用循环确保读够，否则数据会错乱
+int read_strictly(int fd, uint8_t* buf, int len) {
+    int total_read = 0;
+    while (total_read < len) {
+        int n = read(fd, buf + total_read, len - total_read);
+        if (n < 0) return -1; // 错误
+        if (n == 0) continue; // 暂时没数据，继续等
+        total_read += n;
+    }
+    return total_read;
+}
+
+
 
 void Uart_receive::receive_once() {
     if (serial_fd < 0) return;
 
-    uint8_t temp_buf[64];
-    // 非阻塞读取尝试，或者读取当前缓冲区有的所有数据
-    int n = read(serial_fd, temp_buf, sizeof(temp_buf));
+    uint8_t header_byte;
+
+    int n = read(serial_fd, &header_byte, 1);
     
-    if (n > 0) {
-        // 1. 将新数据追加到成员变量 rx_buffer 中
-        rx_buffer.insert(rx_buffer.end(), temp_buf, temp_buf + n);
+    if (n <= 0 || header_byte != 0x55) {
+        return; 
+    }
 
-        // 2. 循环检查缓冲区是否有完整的一包 (长度 19)
-        // 协议：Header(55 AA) ... Tail(0A) Length=19
-        while (rx_buffer.size() >= 19) {
+    if (read_strictly(serial_fd, &header_byte, 1) < 0) return;
+
+    if (header_byte != 0xAA) {
+        return; 
+    }
+
+    // ---------------------------------------------------------
+
+    uint8_t body[17];
+    if (read_strictly(serial_fd, body, 17) == 17) {
+        
+        // -----------------------------------------------------
+        // 第四步：根据功能字 (Type) 进行分支处理
+        // -----------------------------------------------------
+        // 对应关系：
+        // 完整包: [55] [AA] [ID] [Type] [Data...]
+        // body[]:           [0]  [1]    [2...]
+        // 所以 body[1] 就是说明书里的 DATA[3] (寄存器ID)
+        
+        uint8_t data_type = body[1];
+
+        // 临时变量用于拷贝数据
+        union { float f; uint8_t b[4]; } v1, v2, v3;
+
+        // body[2]~body[5]   -> Data1
+        // body[6]~body[9]   -> Data2
+        // body[10]~body[13] -> Data3
+        memcpy(v1.b, &body[2], 4);
+        memcpy(v2.b, &body[6], 4);
+        memcpy(v3.b, &body[10], 4);
+
+        // 分支结构
+        if (data_type == 0x02) {
+            // === 处理角速度 (Gyro) ===
+            imu_data.gyro_x = v1.f;
+            imu_data.gyro_y = v2.f;
+            imu_data.gyro_z = v3.f;
+            // std::cout << "收到角速度包" << std::endl;
+
+        } else if (data_type == 0x03) {
+            // === 处理欧拉角 (Angle) ===
+            imu_data.roll  = (v1.f*2*PI/360);
+            imu_data.pitch = (v2.f*2*PI/360);
+            imu_data.yaw   = (v3.f*2*PI/360);
             
-            // 检查帧头 0x55 0xAA
-            if (rx_buffer[0] == 0x55 && rx_buffer[1] == 0xAA) {
-                
-                // 检查帧尾 0x0A (在索引 18 处)
-                if (rx_buffer[18] == 0x0A) {
-                    // === 找到完整包，进行解析 ===
-                    parse_frame(rx_buffer.data());
-
-                    // 从缓存中移除这 19 个字节
-                    rx_buffer.erase(rx_buffer.begin(), rx_buffer.begin() + 19);
-                } else {
-                    // 头对上了，但尾不对，说明可能是假头或者数据错位
-                    // 移除第一个字节，继续找下一个 0x55
-                    rx_buffer.erase(rx_buffer.begin());
-                }
-            } else {
-                // 没找到头，移除第一个字节，向后滑动
-                rx_buffer.erase(rx_buffer.begin());
-            }
+            // std::cout << "roll：" <<imu_data.roll<< std::endl;
+            // std::cout << "pitch：" <<imu_data.pitch<< std::endl;
+            // std::cout << "yaw：" <<imu_data.yaw<< std::endl;
         }
+        
+
     }
 }
 
-void Uart_receive::parse_frame(const uint8_t* frame) {
-    // frame[0]=0x55, frame[1]=0xAA
-    uint8_t type = frame[3]; // 功能字
-
-    // 定义联合体用于 Byte -> Float 转换
-    union {
-        float f;
-        uint8_t b[4];
-    } x, y, z;
-
-    // 拷贝数据 (小端模式：frame[4]是低字节)
-    memcpy(x.b, &frame[4], 4);
-    memcpy(y.b, &frame[8], 4);
-    memcpy(z.b, &frame[12], 4);
-
-    // 根据类型填充 imu_data 结构体
-    // 注意：这里的 type ID (0x02, 0x03) 需要根据你的实际模块确认
-    // 假设：0x02 是角速度，0x03 是欧拉角(或加速度)
-    
-    switch (type) {
-        case 0x02: // 角速度
-            imu_data.gyro_x = x.f;
-            imu_data.gyro_y = y.f;
-            imu_data.gyro_z = z.f;
-            break;
-            
-        case 0x03: // 假设这是欧拉角 (如果是加速度，请自行修改变量名)
-        case 0x01: // 有些模块欧拉角是 0x01
-            imu_data.roll = x.f;
-            imu_data.pitch = y.f;
-            imu_data.yaw = z.f;
-            break;
-            
-        default:
-            break;
-    }
-}

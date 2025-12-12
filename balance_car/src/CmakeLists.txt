@@ -4,6 +4,8 @@ set(SOURCES
     motor.cpp
     pid.cpp
     can_receive.cpp
+    imu.cpp
+    uart_receive.cpp
 )
 
 
