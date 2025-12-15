@@ -13,20 +13,14 @@ using namespace std::this_thread;
 #define BALANCE_CAR_TASK_INIT_TIME_MS    200
 #define BALANCE_CAR_CONTROL_TIME_MS      2
 
-const PidParam PID_UPRIGHT = {
-    21000.0f,  
-    0.0f,    
-    200000.0f,   
-    0,
-    5000 
-};
+
 
 const PidParam PID_SPEED = {
-    -2.5f,   
-    -0.02f,  
-    0.0f,    
-    500,
-    15.0f 
+    6000.0f,   
+    0.0f,  
+    2.0f,    
+    2000,
+    6000.0f 
 };
 
 const PidParam PID_TURN = {
@@ -55,21 +49,22 @@ void communicate_Task() // C++ 线程函数通常不需要 void* 参数
 {
    
     sleep_for(milliseconds(COMMUNICATE_TASK_INIT_TIME));
-
-        // // 1. 初始化 CAN
-    // if (!can_receive.init("/dev/ttyACM0")) {
-    //     return -1;
-    // }
-
+    printf("通信初始化开始");
         // 1. 初始化 CAN
-    if (!uart_receive.init("/dev/ttyACM0")) {
-        return -1;
+    if (!can_receive.init("/dev/ttyACM0")) {
+        return ;
     }
+    printf("can通信初始化完成");
+        // 1. 初始化 IMU
+    if (!uart_receive.init("/dev/ttyACM1")) {
+        return ;
+    }
+    printf("uart通信初始化完成");
     //can和uart通信初始化成功
     while (true)
     {
         
-        //can_receive.receive_once(); 
+        can_receive.receive_once(); 
         uart_receive.receive_once();
         sleep_for(milliseconds(COMMUNICATE_CONTROL_TIME_MS));
     }
@@ -96,10 +91,6 @@ void balance_Task()
 int main()
 {   
     
-
-
-
-
 
 
 

@@ -51,24 +51,8 @@ void DJI_Motor::update()
    
     this->speed_rpm = (float)now_speed_rpm;
     this->speed_rads = this->speed_rpm * (2.0f * PI / 60.0f); // RPM -> rad/s
+    this->speed_ms = this->speed_rads * 0.03;
+    
+    
 
-    
-    int diff = now_ecd - last_ecd;
-    
-    if (diff > max_ecd / 2) {
-        
-        round_count--; 
-    } else if (diff < -(max_ecd / 2)) {
-        
-        round_count++;
-    }
-    
-    last_ecd = now_ecd; 
-
-   
-    float total_rounds = (float)round_count + (float)now_ecd / (float)(max_ecd + 1);
-    this->total_angle = total_rounds * 2.0f * PI;
-    
-   
-    this->angle_single_round = ((float)now_ecd / (float)(max_ecd + 1)) * 2.0f * PI;
 }

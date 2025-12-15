@@ -22,7 +22,7 @@ public:
 private:
         
 
-
+    int i=0;
     DJI_Motor left_leg;
     DJI_Motor right_leg;
     Imu imu;

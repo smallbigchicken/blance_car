@@ -9,10 +9,11 @@ public:
    
     float speed_rpm;       
     float speed_rads;      
-    
+    float speed_ms;
+
     float angle_single_round; 
     float total_angle;        
-
+    
     
     int16_t current_give;  
 
