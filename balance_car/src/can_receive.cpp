@@ -77,7 +77,6 @@ bool Can_receive::init(const char* port_name) {
     // O = Open (打开 CAN 通道)
     send_slcan_cmd("O");
 
-    std::cout << "SLCAN Initialized (Mode: 1M)." << std::endl;
     return true;
 }
 

@@ -11,7 +11,7 @@ class Car {
 public:
     Car();
     Car(const dji_motor_measure_t* left_ptr,const dji_motor_measure_t* right_ptr,const dm_imu_measure_t* imu_ptr,
-        const PidParam &pid_upright,const PidParam &pid_speed,const PidParam &pid_turn);
+        const PidParam &pid_speed,const PidParam &pid_turn);
 
     // --- 核心任务流函数 ---
     void feedback_update(); // 1. 读取传感器
@@ -27,8 +27,7 @@ private:
     DJI_Motor right_leg;
     Imu imu;
 
-    // PID 对象
-    Pid pid_upright;
+
     Pid pid_speed;
     Pid pid_turn;
 

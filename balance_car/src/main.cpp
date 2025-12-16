@@ -24,17 +24,17 @@ const PidParam PID_SPEED = {
 };
 
 const PidParam PID_TURN = {
-    6.0f,
-    0.0f,
-    0.5f,
-    0,
-    4000
+    4000.0f,   
+    0.0f,  
+    2.0f,    
+    2000,
+    6000.0f 
 };
 
 
 
 
-Car car(can_receive.get_dji_motor_measure_point(0),can_receive.get_dji_motor_measure_point(1),uart_receive.get_imu_measure_point() , PID_UPRIGHT,PID_SPEED,PID_TURN);
+Car car(can_receive.get_dji_motor_measure_point(0),can_receive.get_dji_motor_measure_point(1),uart_receive.get_imu_measure_point(),PID_SPEED,PID_TURN);
 
 
 // ================= 全局互斥锁 (Method 3 核心) =================
@@ -49,17 +49,17 @@ void communicate_Task() // C++ 线程函数通常不需要 void* 参数
 {
    
     sleep_for(milliseconds(COMMUNICATE_TASK_INIT_TIME));
-    printf("通信初始化开始");
+    std::cout<<"通信初始化开始"<<std::endl;
         // 1. 初始化 CAN
-    if (!can_receive.init("/dev/ttyACM0")) {
+    if (!can_receive.init("/dev/ttyACM1")) {
         return ;
     }
-    printf("can通信初始化完成");
+    std::cout<<"can通信初始化完成"<<std::endl;
         // 1. 初始化 IMU
-    if (!uart_receive.init("/dev/ttyACM1")) {
+    if (!uart_receive.init("/dev/ttyACM0")) {
         return ;
     }
-    printf("uart通信初始化完成");
+    std::cout<<"uart通信初始化完成"<<std::endl;
     //can和uart通信初始化成功
     while (true)
     {
