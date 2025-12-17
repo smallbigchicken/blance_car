@@ -154,22 +154,24 @@ void Can_receive::receive_once() {
                     data[i] = hex_str_to_byte(data_ptr + i * 2);
                 }
 
-                // // --- [调试打印 2]：打印解析后的 ID 和 Hex 数据 ---
-                // printf(" -> Parsed ID: 0x%03X | Data: ", can_id);
-                // for(int i=0; i<8; i++) {
-                //     printf("%02X ", data[i]);
-                // }
-                // printf("\n");
+                // --- [调试打印 2]：打印解析后的 ID 和 Hex 数据 ---
+                printf(" -> Parsed ID: 0x%03X | Data: ", can_id);
+                for(int i=0; i<8; i++) {
+                    printf("%02X ", data[i]);
+                }
+                printf("\n");
                 
+                // --- 加上这行调试 ---
+                printf("Debug Check: can_id(dec)=%d, TARGET_ID(dec)=%d\n", can_id, CAN_LEFT_LEG_MOTOR_ID);
 
                 // 4. 根据 ID 分发数据
                 if (can_id == CAN_LEFT_LEG_MOTOR_ID) {
                     get_dji_motor_measure(&legs[0], data);
-                    
+                    std::cout<<1<<std::endl;
                 }
                 else if (can_id == CAN_RIGHT_LEG_MOTOR_ID) {
                     get_dji_motor_measure(&legs[1], data);
-                    std::cout<<"转速"<<legs[1].speed_rpm<<std::endl;
+                    std::cout<<1<<std::endl;
                 }
             }
         } else {
@@ -187,7 +189,7 @@ void Can_receive::get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t 
     dji_motor->speed_rpm = (uint16_t)(data[2] << 8 | data[3]);
     dji_motor->given_current = (uint16_t)(data[4] << 8 | data[5]);
     dji_motor->temperate = data[6];
-    
+    std::cout<<dji_motor->speed_rpm<<std::endl;
 }
 
 const dji_motor_measure_t *Can_receive::get_dji_motor_measure_point(uint8_t i)

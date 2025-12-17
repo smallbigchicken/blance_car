@@ -5,54 +5,54 @@
 
 
 
-Motor::Motor() {
-    speed_rpm = 0;
-    speed_rads = 0;
-    angle_single_round = 0;
-    total_angle = 0;
-    current_give = 0;
-}
-
-
-DJI_Motor::DJI_Motor() : Motor() {
-    motor_measure = NULL;
-    offset_ecd = 0;
-    max_ecd = 8191;
-    last_ecd = 0;
-    round_count = 0;
+Motor::Motor(const fp32* speed_parm
+    )
+    : 
+    speed(0), speed_set(0),
+    current_give(0),
+    speed_pid(speed_parm != NULL ? 
+                Pid(0, speed_parm, &speed, &speed_set) : Pid())
+{
+    
 }
 
 DJI_Motor::DJI_Motor(const dji_motor_measure_t* measure_ptr,
-                     uint16_t offset,
-                     uint16_t max) 
-                     : Motor() // 调用父类构造
-{
-    motor_measure = measure_ptr;
-    offset_ecd = offset;
-    max_ecd = max;
-    
-    // 初始化记录值，防止上电第一帧数据导致圈数误判
-    if (measure_ptr != NULL) {
-        last_ecd = measure_ptr->ecd;
-    } else {
-        last_ecd = 0;
-    }
-    round_count = 0;
-}
+                     const fp32* speed_parm
+                     ): 
+      Motor(speed_parm),
+      motor_measure(measure_ptr)
+{}
+
 
 void DJI_Motor::update()
 {
-    if (motor_measure == NULL) return;
+    this->speed = motor_measure->speed_rpm * DJI_RPM_TO_RAD;
+    //std::cout<<this->speed<<std::endl;
+    //std::cout<<motor_measure->speed_rpm<<std::endl;
+}
 
-    
-    uint16_t now_ecd = motor_measure->ecd;
-    int16_t now_speed_rpm = motor_measure->speed_rpm; // DJI直接给的是RPM
 
-   
-    this->speed_rpm = (float)now_speed_rpm;
-    this->speed_rads = this->speed_rpm * (2.0f * PI / 60.0f); // RPM -> rad/s
-    this->speed_ms = this->speed_rads * 0.03;
-    
-    
 
+void Motor::set(float set, uint8_t mode)
+{
+    switch (mode)
+    {
+    case SPEED:
+        this->speed_set = set;
+        break;
+    default:
+        break;
+    }
+}
+
+void Motor::solve(uint8_t mode)
+{
+    switch (mode)
+    {
+    case SPEED:
+        current_give = speed_pid.pid_calc();
+        break;
+    default:
+        break;
+    }
 }

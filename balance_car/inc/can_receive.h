@@ -48,6 +48,7 @@ public:
     void receive_once();
 
 private:
+    std::string rx_buffer_; // <--- 新增：用于缓存未处理完的数据
     // 内部数据解析回调 (保持不变)
     void get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t data[8]);
 

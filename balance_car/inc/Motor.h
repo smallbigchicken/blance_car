@@ -2,24 +2,28 @@
 #define MOTOR_H
        
 #include "can_receive.h" 
-
+#include "pid.h"
+#define SPEED 0
+#define DJI_RPM_TO_RAD 0.10466666 //2*PI/60*19 因为没有减速箱
 
 class Motor {
 public:
    
-    float speed_rpm;       
-    float speed_rads;      
-    float speed_ms;
+    //speed & speed_set rad/s
+    float speed;
+    float speed_set;
 
-    float angle_single_round; 
-    float total_angle;        
-    
-    
-    int16_t current_give;  
 
-   
-    Motor();
+    //speed_PID
+    Pid speed_pid;
+    float current_give;
+
+    Motor(const fp32* speed_parm = NULL
+          );
+
     virtual void update() = 0;
+    void set(float set,uint8_t mode);
+    void solve(uint8_t mode);
 };
 
 class DJI_Motor : public Motor
@@ -28,19 +32,10 @@ public:
     
     const dji_motor_measure_t *motor_measure;
 
-    
-    uint16_t offset_ecd;  
-    uint16_t max_ecd;      
-
-   
-    int32_t round_count;  
-    uint16_t last_ecd;    
-
-    
     DJI_Motor(); 
-    DJI_Motor(const dji_motor_measure_t* measure_ptr,
-              uint16_t offset_ecd = 0,
-              uint16_t max_ecd = 8191);
+    DJI_Motor(const dji_motor_measure_t* motor_ptr,
+              const fp32* speed_parm = NULL
+              );
 
    
     void update() override; 
