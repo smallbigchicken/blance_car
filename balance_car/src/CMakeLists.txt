@@ -9,6 +9,8 @@ set(SOURCES
         LCD_driver.cpp
         LCD_gui.cpp
         adxl345.cpp
+        i2c.cpp
+        pac9557.cpp
         font/font8.cpp
         font/font12.cpp
         font/font16.cpp

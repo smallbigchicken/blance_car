@@ -6,6 +6,7 @@
 #include "car.h"
 #include "GestureReceiver.h"
 #include "LCD_gui.h"
+#include "pca9557.h"
 using namespace std;
 using namespace std::chrono;
 using namespace std::this_thread;
@@ -15,10 +16,10 @@ using namespace std::this_thread;
 #define COMMUNICATE_CONTROL_TIME_MS 1
 #define BALANCE_CAR_TASK_INIT_TIME_MS 200
 #define BALANCE_CAR_CONTROL_TIME_MS 1
-#define PROGRAM_RUN_TIME_SECONDS 1000  // 主程序运行总时长
+#define PROGRAM_RUN_TIME_SECONDS 1200  // 主程序运行总时长
 // Python 环境和脚本路径配置
 const std::string PYTHON_BIN = "/usr/local/miniconda3/bin/python";
-const std::string SCRIPT_PATH = "/home/HwHiAiUser/yhy_test/car/usb_camera_yolo/py/named_pipes.py";
+const std::string SCRIPT_PATH = "/home/HwHiAiUser/blance_car/balance_car/py/named_pipes.py";
 const std::string PIPE_PATH = "/tmp/my_pipe";
 
 float LEG_SPEED_PID[6] = {800.0f, 0.8f, 110.0f, 0.0f, 200.0f, 6000.0f};
@@ -161,26 +162,50 @@ void vision_Task()
 }
 
 
-void lcd_Task(){
-
-    LCD_Init(L2R_U2D,1000);
-    LCD_Clear(BLUE);  
+void lcd_Task()
+{
+    LCD_Init(L2R_U2D, 1000);
+    LCD_Clear(BLUE);
     GUI_Show();
 
-    while(g_enable_balance_loop){
-    	sensor(car.target_speed,car.target_turn);
-        
-     }
+    while (g_enable_balance_loop)
+    {
+        sensor(g_speed_set, g_yaw_rate_set);
+    }
 
     LCD_Exit();
-
 }
 
+void LEDnums_Task()
+{
+    //数码管上显示倒计时
+    pca9557_init("/dev/i2c-7");
+    pca9557_setnum(0, 0, 0, 0);
+    int time_left = PROGRAM_RUN_TIME_SECONDS;
+    while (g_enable_balance_loop)
+    {
+        time_left--;
+        int minutes = time_left / 60;
+        int seconds = time_left % 60;
+        int tens_seconds = seconds / 10;
+        int units_seconds = seconds % 10;
+        pca9557_setnum(minutes / 10, minutes % 10, tens_seconds, units_seconds);
+        sleep_for(milliseconds(1000));
+    }
+}
+
+void LEDnums_Task2()
+{
+    pca9557_show();
+}
 
 int main()
 {
     std::cout << "主程序启动，将在 " << PROGRAM_RUN_TIME_SECONDS << " 秒后自动结束。" << std::endl;
 
+
+    thread t_led(LEDnums_Task);
+    thread t_led2(LEDnums_Task2);
     // 启动 Python 视觉识别子进程
     // 必须在开启控制循环之前启动，确保管道就绪
     if (!gesture_receiver.start())
@@ -215,6 +240,10 @@ int main()
         t_lcd.join(); // 再 join 显示任务
     if (t_vision.joinable())
         t_vision.join(); // 最后 join 视觉任务
+    if (t_led.joinable())
+        t_led.join();
+    if (t_led2.joinable())
+        t_led2.join();
 
     std::cout << "所有线程已退出，程序结束。" << std::endl;
     return 0;

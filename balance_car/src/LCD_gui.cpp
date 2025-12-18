@@ -532,16 +532,16 @@ void sensor(float speed,float turn)
     sprintf(fs3, "%.2f", buff[3]);
     sprintf(fs4, "%.2f", buff[4]);
     printf("AngleX:%0.3f AngleY:%0.3f\n",buff[0],buff[1]);
-    GUI_DisString_EN(100, 200, "balancd_car", &Font24, RED, BLUE);
+    GUI_DisString_EN(50, 200, "balancd_car", &Font24, RED, BLUE);
     GUI_DisString_EN(20, 320, "roll:", &Font20, RED, BLUE);
     GUI_DisString_EN(20, 340, "pitch:", &Font20, RED, BLUE);
-    GUI_DisString_EN(100, 320, fs1, &Font16, LCD_BACKGROUND, BLUE);
-    GUI_DisString_EN(100, 340, fs2 , &Font16, LCD_BACKGROUND, BLUE);
+    GUI_DisString_EN(240, 320, fs1, &Font16, LCD_BACKGROUND, BLUE);
+    GUI_DisString_EN(240, 340, fs2 , &Font16, LCD_BACKGROUND, BLUE);
 
 
     GUI_DisString_EN(20, 240, "speed mps:", &Font20, RED, BLUE);
     GUI_DisString_EN(20, 280, "yaw_gyro radps:", &Font20, RED, BLUE);
-    GUI_DisString_EN(180, 240, fs3 , &Font16, LCD_BACKGROUND, BLUE);
+    GUI_DisString_EN(240, 240, fs3 , &Font16, LCD_BACKGROUND, BLUE);
     GUI_DisString_EN(240, 280, fs4 , &Font16, LCD_BACKGROUND, BLUE);
     
 
