@@ -5,7 +5,7 @@
 #include <atomic>
 #include "car.h"
 #include "GestureReceiver.h"
-
+#include "LCD_gui.h"
 using namespace std;
 using namespace std::chrono;
 using namespace std::this_thread;
@@ -15,7 +15,7 @@ using namespace std::this_thread;
 #define COMMUNICATE_CONTROL_TIME_MS 1
 #define BALANCE_CAR_TASK_INIT_TIME_MS 200
 #define BALANCE_CAR_CONTROL_TIME_MS 1
-#define PROGRAM_RUN_TIME_SECONDS 100  // 主程序运行总时长
+#define PROGRAM_RUN_TIME_SECONDS 1000  // 主程序运行总时长
 // Python 环境和脚本路径配置
 const std::string PYTHON_BIN = "/usr/local/miniconda3/bin/python";
 const std::string SCRIPT_PATH = "/home/HwHiAiUser/yhy_test/car/usb_camera_yolo/py/named_pipes.py";
@@ -130,12 +130,12 @@ void vision_Task()
                 g_yaw_rate_set = 0.0f; // 角速度 rad/s
                 break;
             case 2: // 左转
-                g_speed_set = 0.0f; // 线速度 m/s
-                g_yaw_rate_set = 0.2f; // 角速度 rad/s
+                g_speed_set = 0.15f; // 线速度 m/s
+                g_yaw_rate_set = 0.8f; // 角速度 rad/s
                 break;
             case 3: // 右转
-                g_speed_set = 0.0f; // 线速度 m/s
-                g_yaw_rate_set = -0.2f; // 角速度 rad/s
+                g_speed_set = 0.15f; // 线速度 m/s
+                g_yaw_rate_set = -0.8f; // 角速度 rad/s
                 break;
             case 4: // 后退
                 g_speed_set = 0.0f; // 线速度 m/s
@@ -160,6 +160,23 @@ void vision_Task()
     cmd_gesture_id = -1;
 }
 
+
+void lcd_Task(){
+
+    LCD_Init(L2R_U2D,1000);
+    LCD_Clear(BLUE);  
+    GUI_Show();
+
+    while(g_enable_balance_loop){
+    	sensor(car.target_speed,car.target_turn);
+        
+     }
+
+    LCD_Exit();
+
+}
+
+
 int main()
 {
     std::cout << "主程序启动，将在 " << PROGRAM_RUN_TIME_SECONDS << " 秒后自动结束。" << std::endl;
@@ -182,21 +199,20 @@ int main()
 
     thread t_comm(communicate_Task);
     thread t_balance(balance_Task);
-
+    thread t_lcd(lcd_Task);
     sleep_for(seconds(PROGRAM_RUN_TIME_SECONDS));
 
     // [修改5] Main 只负责通知 Balance 任务停下来
     std::cout << "[Main] 时间到，请求停止平衡任务..." << std::endl;
     g_enable_balance_loop = false;
 
-    // [修改6] 等待线程回收
-    // 注意：虽然我们只修改了 g_enable_balance_loop，但 t_balance 会在结束后
-    // 自动修改 g_balance_task_finished，从而导致 t_comm 退出。
-    // 所以这里依然是安全的。
+
     if (t_balance.joinable())
         t_balance.join(); // 建议先 join 平衡任务（逻辑上它先结束）
     if (t_comm.joinable())
         t_comm.join(); // 再 join 通信任务
+    if (t_lcd.joinable())
+        t_lcd.join(); // 再 join 显示任务
     if (t_vision.joinable())
         t_vision.join(); // 最后 join 视觉任务
 

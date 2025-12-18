@@ -6,6 +6,14 @@ set(SOURCES
         can_receive.cpp
         imu.cpp
         uart_receive.cpp
+        LCD_driver.cpp
+        LCD_gui.cpp
+        adxl345.cpp
+        font/font8.cpp
+        font/font12.cpp
+        font/font16.cpp
+        font/font20.cpp
+        font/font24.cpp
 )
 
 

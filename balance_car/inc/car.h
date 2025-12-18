@@ -25,7 +25,6 @@ public:
     void output();          // 4. 发送电流给电机
     void finish();
 
-private:
         
     void calculate_differential_target();
     int i=0;
