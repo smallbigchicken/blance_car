@@ -18,7 +18,7 @@ class YOLOv10ONNX:
     def __init__(self, min_conf: float = 0.8, onnx_path: str = model_path, imgsz: int = 480,
                  use_gpu: bool = True):
         self.imgsz = imgsz
-        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if use_gpu else ['CPUExecutionProvider']
+        providers = ['CANNExecutionProvider'] if use_gpu else ['CPUExecutionProvider']
         self.session = ort.InferenceSession(onnx_path, providers=providers)
         self.input_name = self.session.get_inputs()[0].name
         self.output_names = [o.name for o in self.session.get_outputs()]
@@ -145,19 +145,19 @@ if __name__ == "__main__":
     cap1 = VideoCamera()
     gestures_model = YOLOv10ONNX()
 
-    # frame_count=0
-    # count_time=time.time()
-    # while time.time()-count_time<=30:
-    #     start = time.time()
-    #     frame = cap1.get_raw_frame()
-    #     if frame is None:
-    #         break
-    #     gestures_num = gestures_model.detect(frame)
-    #     if frame_count % 10 == 0:
-    #         cv2.imwrite(f'result_{frame_count}.jpg', frame)
-    #     fps = 1.0 / (time.time() - start)
-    #     frame_count+=1
-    #     print(gestures_num,fps)
+    frame_count=0
+    count_time=time.time()
+    while time.time()-count_time<=30:
+        start = time.time()
+        frame = cap1.get_raw_frame()
+        if frame is None:
+            break
+        gestures_num = gestures_model.detect(frame)
+        if frame_count % 10 == 0:
+            cv2.imwrite(f'result_{frame_count}.jpg', frame)
+        fps = 1.0 / (time.time() - start)
+        frame_count+=1
+        print(gestures_num,fps)
 
-    while True:
-        print(gestures_model.stable_detect(cap1))
+    # while True:
+    #     print(gestures_model.stable_detect(cap1))

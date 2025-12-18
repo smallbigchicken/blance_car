@@ -15,7 +15,7 @@ using namespace std::this_thread;
 #define COMMUNICATE_CONTROL_TIME_MS 1
 #define BALANCE_CAR_TASK_INIT_TIME_MS 200
 #define BALANCE_CAR_CONTROL_TIME_MS 1
-#define PROGRAM_RUN_TIME_SECONDS 120  // 主程序运行总时长
+#define PROGRAM_RUN_TIME_SECONDS 100  // 主程序运行总时长
 // Python 环境和脚本路径配置
 const std::string PYTHON_BIN = "/usr/local/miniconda3/bin/python";
 const std::string SCRIPT_PATH = "/home/HwHiAiUser/yhy_test/car/usb_camera_yolo/py/named_pipes.py";
@@ -131,19 +131,19 @@ void vision_Task()
                 break;
             case 2: // 左转
                 g_speed_set = 0.0f; // 线速度 m/s
-                g_yaw_rate_set = 1.0f; // 角速度 rad/s
+                g_yaw_rate_set = 0.2f; // 角速度 rad/s
                 break;
             case 3: // 右转
                 g_speed_set = 0.0f; // 线速度 m/s
-                g_yaw_rate_set = -1.0f; // 角速度 rad/s
+                g_yaw_rate_set = -0.2f; // 角速度 rad/s
                 break;
             case 4: // 后退
-                g_speed_set = -0.2f; // 线速度 m/s
+                g_speed_set = 0.0f; // 线速度 m/s
                 g_yaw_rate_set = 0.0f; // 角速度 rad/s
                 break;
             case 5: // 自转
                 g_speed_set = 0.0f; // 线速度 m/s
-                g_yaw_rate_set = 0.0f; // 角速度 rad/s
+                g_yaw_rate_set = 1.5f; // 角速度 rad/s
                 break;
             default:
                 g_speed_set = 0.0f; // 线速度 m/s

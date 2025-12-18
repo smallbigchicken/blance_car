@@ -169,7 +169,7 @@ void Can_receive::receive_once() {
                 }
                 else if (can_id == CAN_RIGHT_LEG_MOTOR_ID) {
                     get_dji_motor_measure(&legs[1], data);
-                    std::cout<<"转速"<<legs[1].speed_rpm<<std::endl;
+                    // std::cout<<"转速"<<legs[1].speed_rpm<<std::endl;
                 }
             }
         } else {

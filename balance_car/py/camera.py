@@ -64,6 +64,7 @@ class VideoCamera():
 
 if __name__ == "__main__":
     camera = VideoCamera()
+    import time
     # while True:
     #     frame = camera.get_jpeg_frame()
     #     if frame == bytes({1}):
@@ -88,14 +89,14 @@ if __name__ == "__main__":
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 常见编码还有 'MJPG', 'MP4V'
     out = cv2.VideoWriter('output.avi', fourcc, 30, (640, 480))
-
-    while True:
+    start=time.time()
+    while time.time()-start<5:  # 录制5秒视频
         frame = camera.get_raw_frame()
         out.write(frame)  # 写入当前帧
-        cv2.imshow('frame', frame)  # 显示当前帧
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # 按 'q' 退出
-            break
+        # cv2.imshow('frame', frame)  # 显示当前帧
+        # if cv2.waitKey(1) & 0xFF == ord('q'):  # 按 'q' 退出
+        #     break
 
     camera.__del__()
     out.release()
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
