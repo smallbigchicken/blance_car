@@ -4,6 +4,7 @@
 #include <chrono>
 #include <atomic>
 #include "car.h"
+#include "GestureReceiver.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -14,7 +15,11 @@ using namespace std::this_thread;
 #define COMMUNICATE_CONTROL_TIME_MS 1
 #define BALANCE_CAR_TASK_INIT_TIME_MS 200
 #define BALANCE_CAR_CONTROL_TIME_MS 1
-#define PROGRAM_RUN_TIME_SECONDS 10
+#define PROGRAM_RUN_TIME_SECONDS 120  // 主程序运行总时长
+// Python 环境和脚本路径配置
+const std::string PYTHON_BIN = "/usr/local/miniconda3/bin/python";
+const std::string SCRIPT_PATH = "/home/HwHiAiUser/yhy_test/car/usb_camera_yolo/py/named_pipes.py";
+const std::string PIPE_PATH = "/tmp/my_pipe";
 
 float LEG_SPEED_PID[6] = {800.0f, 0.8f, 110.0f, 0.0f, 200.0f, 6000.0f};
 
@@ -22,6 +27,8 @@ Car car(can_receive.get_dji_motor_measure_point(0),
         can_receive.get_dji_motor_measure_point(1),
         uart_receive.get_imu_measure_point(),
         LEG_SPEED_PID);
+
+GestureReceiver gesture_receiver(PIPE_PATH, PYTHON_BIN, SCRIPT_PATH);
 
 // ================= 全局变量 =================
 mutex xGlobalDataMutex;
@@ -33,6 +40,11 @@ std::atomic<bool> g_enable_balance_loop(true);
 // 标志B：平衡任务是否彻底结束（包括刹车过程），用来控制通信任务退出
 // 初始为 false，只有当平衡任务彻底跑完后，才会变成 true
 std::atomic<bool> g_balance_task_finished(false);
+
+// 小车运动相关
+float g_speed_set = 0.0f; // 线速度 m/s
+float g_yaw_rate_set = 0.0f; // 角速度 rad/s
+int cmd_gesture_id = -1;
 
 // ================= 任务 1: 通信任务 =================
 void communicate_Task()
@@ -58,7 +70,7 @@ void communicate_Task()
     std::cout << "[Comm] 收到平衡任务结束信号，通信任务停止。" << std::endl;
 }
 
-// ================= 任务 2: 平衡控制任务 =================
+// ================= 任务 2: 控制任务 =================
 void balance_Task()
 {
     sleep_for(milliseconds(BALANCE_CAR_TASK_INIT_TIME_MS));
@@ -67,7 +79,7 @@ void balance_Task()
     while (g_enable_balance_loop)
     {
         car.feedback_update();
-        car.set_control(0.15, 0); // m/s；rad/s,顺时针为正
+        car.set_control(g_speed_set, g_yaw_rate_set); // m/s；rad/s,顺时针为正
         car.solve();
         car.output();
         sleep_for(milliseconds(BALANCE_CAR_CONTROL_TIME_MS));
@@ -83,9 +95,86 @@ void balance_Task()
     std::cout << "[Balance] 平衡控制任务已退出。" << std::endl;
 }
 
+// ================= 任务 3: 视觉识别 =================
+void vision_Task()
+{
+    g_speed_set = 0.0f; // 线速度 m/s
+    g_yaw_rate_set = 0.0f; // 角速度 rad/s
+    cmd_gesture_id = gesture_receiver.getGestureId();
+    bool flag = false; //没有在执行手势信号
+    auto start = high_resolution_clock::now();
+    while (g_enable_balance_loop)
+    {
+        if (flag && high_resolution_clock::now() - start > seconds(5))
+        {
+            flag = false;
+            g_speed_set = 0.0f; // 线速度 m/s
+            g_yaw_rate_set = 0.0f; // 角速度 rad/s
+            cmd_gesture_id = -1;
+            cout << "[Vision] 手势控制结束，恢复静止状态" << endl;
+        }
+        if (!flag)
+        {
+            g_speed_set = 0.0f; // 线速度 m/s
+            g_yaw_rate_set = 0.0f; // 角速度 rad/s
+        }
+        cmd_gesture_id = gesture_receiver.getGestureId();
+        if (cmd_gesture_id != -1 && !flag)
+        {
+            start = high_resolution_clock::now();
+            flag = true;
+            switch (cmd_gesture_id)
+            {
+            case 1: // 前进
+                g_speed_set = 0.2f; // 线速度 m/s
+                g_yaw_rate_set = 0.0f; // 角速度 rad/s
+                break;
+            case 2: // 左转
+                g_speed_set = 0.0f; // 线速度 m/s
+                g_yaw_rate_set = 1.0f; // 角速度 rad/s
+                break;
+            case 3: // 右转
+                g_speed_set = 0.0f; // 线速度 m/s
+                g_yaw_rate_set = -1.0f; // 角速度 rad/s
+                break;
+            case 4: // 后退
+                g_speed_set = -0.2f; // 线速度 m/s
+                g_yaw_rate_set = 0.0f; // 角速度 rad/s
+                break;
+            case 5: // 自转
+                g_speed_set = 0.0f; // 线速度 m/s
+                g_yaw_rate_set = 0.0f; // 角速度 rad/s
+                break;
+            default:
+                g_speed_set = 0.0f; // 线速度 m/s
+                g_yaw_rate_set = 0.0f; // 角速度 rad/s
+                break;
+            }
+            cout << "[Vision] 接收到手势 ID: " << cmd_gesture_id << " 开始执行运动 -线速度:" << g_speed_set << "m/s 角速度:" <<
+                g_yaw_rate_set << "rad/s" << endl;
+        }
+        sleep_for(milliseconds(50)); // 调整读取频率
+    }
+    g_speed_set = 0.0f; // 线速度 m/s
+    g_yaw_rate_set = 0.0f; // 角速度 rad/s
+    cmd_gesture_id = -1;
+}
+
 int main()
 {
     std::cout << "主程序启动，将在 " << PROGRAM_RUN_TIME_SECONDS << " 秒后自动结束。" << std::endl;
+
+    // 启动 Python 视觉识别子进程
+    // 必须在开启控制循环之前启动，确保管道就绪
+    if (!gesture_receiver.start())
+    {
+        std::cerr << "[Error] 无法启动视觉模块，程序终止！" << std::endl;
+        return -1;
+    }
+    // 稍微给一点时间让 Python 预热加载模型（可选，视Python脚本启动速度而定）
+    sleep_for(milliseconds(500));
+    thread t_vision(vision_Task);
+    std::cout << "[Main] 视觉模块启动完成。" << std::endl;
 
     // 先把标志位重置好（防止意外）
     g_enable_balance_loop = true;
@@ -108,6 +197,8 @@ int main()
         t_balance.join(); // 建议先 join 平衡任务（逻辑上它先结束）
     if (t_comm.joinable())
         t_comm.join(); // 再 join 通信任务
+    if (t_vision.joinable())
+        t_vision.join(); // 最后 join 视觉任务
 
     std::cout << "所有线程已退出，程序结束。" << std::endl;
     return 0;

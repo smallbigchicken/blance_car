@@ -1,0 +1,22 @@
+set(SOURCES
+        main.cpp
+        car.cpp
+        motor.cpp
+        pid.cpp
+        can_receive.cpp
+        imu.cpp
+        uart_receive.cpp
+)
+
+
+add_executable(balance_car_app ${SOURCES})
+
+
+target_include_directories(balance_car_app PRIVATE
+        ${PROJECT_SOURCE_DIR}/inc
+)
+
+
+target_link_libraries(balance_car_app PRIVATE
+        Threads::Threads
+)

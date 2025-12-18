@@ -5,7 +5,7 @@
 
 
 
-Motor::Motor(const fp32* speed_parm
+motor::motor(const fp32* speed_parm
     )
     : 
     speed(0), speed_set(0),
@@ -19,7 +19,7 @@ Motor::Motor(const fp32* speed_parm
 DJI_Motor::DJI_Motor(const dji_motor_measure_t* measure_ptr,
                      const fp32* speed_parm
                      ): 
-      Motor(speed_parm),
+      motor(speed_parm),
       motor_measure(measure_ptr)
 {}
 
@@ -33,7 +33,7 @@ void DJI_Motor::update()
 
 
 
-void Motor::set(float set, uint8_t mode)
+void motor::set(float set, uint8_t mode)
 {
     switch (mode)
     {
@@ -45,7 +45,7 @@ void Motor::set(float set, uint8_t mode)
     }
 }
 
-void Motor::solve(uint8_t mode)
+void motor::solve(uint8_t mode)
 {
     switch (mode)
     {

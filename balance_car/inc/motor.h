@@ -6,7 +6,7 @@
 #define SPEED 0
 #define DJI_RPM_TO_RAD 0.10466666 //2*PI/60*19 因为没有减速箱
 
-class Motor {
+class motor {
 public:
    
     //speed & speed_set rad/s
@@ -18,7 +18,7 @@ public:
     Pid speed_pid;
     float current_give;
 
-    Motor(const fp32* speed_parm = NULL
+    motor(const fp32* speed_parm = NULL
           );
 
     virtual void update() = 0;
@@ -26,7 +26,7 @@ public:
     void solve(uint8_t mode);
 };
 
-class DJI_Motor : public Motor
+class DJI_Motor : public motor
 {
 public:
     
