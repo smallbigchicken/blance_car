@@ -26,9 +26,8 @@ DJI_Motor::DJI_Motor(const dji_motor_measure_t* measure_ptr,
 
 void DJI_Motor::update()
 {
+    //做速度控制，仅需更新电机速度
     this->speed = motor_measure->speed_rpm * DJI_RPM_TO_RAD;
-    //std::cout<<this->speed<<std::endl;
-    //std::cout<<motor_measure->speed_rpm<<std::endl;
 }
 
 
@@ -49,7 +48,7 @@ void motor::solve(uint8_t mode)
 {
     switch (mode)
     {
-    case SPEED:
+    case SPEED://pid解算
         current_give = speed_pid.pid_calc();
         break;
     default:

@@ -3,7 +3,7 @@
 
 #include "pid.h"
 #include "motor.h"
-#include "imu.h"
+
 
 struct WheelSpeeds {
     float left_velocity;  // m/s
@@ -15,22 +15,20 @@ public:
     Car();
     Car(const dji_motor_measure_t* left_motor_ptr,
         const dji_motor_measure_t* right_motor_ptr,
-        const dm_imu_measure_t* imu_ptr,
         const fp32* speed_parm = NULL);
 
     // --- 核心任务流函数 ---
-    void feedback_update(); // 1. 读取传感器
-    void set_control(float v, float w);     // 2. 设定目标 (来自遥控器)
-    void solve();           // 3. PID 计算
-    void output();          // 4. 发送电流给电机
-    void finish();
+    void feedback_update(); // 更新电机速度
+    void set_control(float v, float w);     //  设定目标 电机速度
+    void solve();           //  PID 计算
+    void output();          //  发送电流给电机
+    void finish();          //  停止电机输出
 
         
     void calculate_differential_target();
     int i=0;
     DJI_Motor left_leg;
     DJI_Motor right_leg;
-    Imu imu;
 
     //当前值
     float current_speed;//前进速度

@@ -22,11 +22,14 @@ const std::string PYTHON_BIN = "/usr/local/miniconda3/bin/python";
 const std::string SCRIPT_PATH = "/home/HwHiAiUser/blance_car/balance_car/py/named_pipes.py";
 const std::string PIPE_PATH = "/tmp/my_pipe";
 
+
+//电机pid参数
 float LEG_SPEED_PID[6] = {800.0f, 0.8f, 110.0f, 0.0f, 200.0f, 6000.0f};
 
+
+//car类初始化
 Car car(can_receive.get_dji_motor_measure_point(0),
         can_receive.get_dji_motor_measure_point(1),
-        uart_receive.get_imu_measure_point(),
         LEG_SPEED_PID);
 
 GestureReceiver gesture_receiver(PIPE_PATH, PYTHON_BIN, SCRIPT_PATH);
@@ -34,12 +37,10 @@ GestureReceiver gesture_receiver(PIPE_PATH, PYTHON_BIN, SCRIPT_PATH);
 // ================= 全局变量 =================
 mutex xGlobalDataMutex;
 
-// [修改1] 标志位改名，逻辑分离
-// 标志A：控制主程序是否让“平衡任务”继续运行
+
 std::atomic<bool> g_enable_balance_loop(true);
 
-// 标志B：平衡任务是否彻底结束（包括刹车过程），用来控制通信任务退出
-// 初始为 false，只有当平衡任务彻底跑完后，才会变成 true
+
 std::atomic<bool> g_balance_task_finished(false);
 
 // 小车运动相关
@@ -59,12 +60,10 @@ void communicate_Task()
     }
     std::cout << "[Comm] can通信初始化完成" << std::endl;
 
-    // [修改2] 通信任务的生命周期不再由 main 决定，而是看 balance 任务是否完成
-    // 只要 balance 任务没彻底结束 (!g_balance_task_finished)，我就得一直发数据
+
     while (!g_balance_task_finished)
     {
-        can_receive.receive_once();
-        // uart_receive.receive_once();
+        can_receive.receive_once();//读取电机反馈报文
         sleep_for(milliseconds(COMMUNICATE_CONTROL_TIME_MS));
     }
 
@@ -76,7 +75,7 @@ void balance_Task()
 {
     sleep_for(milliseconds(BALANCE_CAR_TASK_INIT_TIME_MS));
 
-    // [修改3] 这里监听 Main 发出的停止信号
+    //小车运动控制流程
     while (g_enable_balance_loop)
     {
         car.feedback_update();
@@ -86,11 +85,11 @@ void balance_Task()
         sleep_for(milliseconds(BALANCE_CAR_CONTROL_TIME_MS));
     }
 
-    car.finish(); // 【关键】此时 communicate_Task 还在跑，所以这帧数据能发出去！
+    car.finish(); // 【
     sleep_for(milliseconds(100));
     std::cout << "[Balance] 电机已停止输出。" << std::endl;
 
-    // [修改4] 刹车完毕，交出接力棒，通知通信任务可以下班了
+
     g_balance_task_finished = true;
 
     std::cout << "[Balance] 平衡控制任务已退出。" << std::endl;
@@ -218,7 +217,7 @@ int main()
     thread t_vision(vision_Task);
     std::cout << "[Main] 视觉模块启动完成。" << std::endl;
 
-    // 先把标志位重置好（防止意外）
+    // 初始化标识位
     g_enable_balance_loop = true;
     g_balance_task_finished = false;
 

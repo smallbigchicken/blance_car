@@ -4,8 +4,6 @@ set(SOURCES
         motor.cpp
         pid.cpp
         can_receive.cpp
-        imu.cpp
-        uart_receive.cpp
         LCD_driver.cpp
         LCD_gui.cpp
         adxl345.cpp

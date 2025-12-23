@@ -5,6 +5,7 @@
 #define OLD 1
 #define NEW 2
 
+//限幅
 #define LimitMax(input, max)   \
     {                          \
         if (input > max)       \
@@ -17,6 +18,7 @@
         }                      \
     }
 
+//初始化PID参数
 void Pid::init(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_, fp32 erro_delta_)
 {
     mode = mode_;
@@ -57,17 +59,8 @@ Pid::Pid(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_)
 
 
 
-/**
-  * @brief          pid计算
-  * @param[out]     pid: PID结构数据指针
-  * @param[in]      ref: 反馈数据
-  * @param[in]      set: 设定值
-  * @retval         pid输出
-  */
-
-
- fp32 Pid::pid_calc()
- {
+//pid计算
+ fp32 Pid::pid_calc(){
      data.last_error = data.error;
      data.error = *data.set - *data.ref;
      if (mode == PID_SPEED)
@@ -90,11 +83,7 @@ Pid::Pid(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_)
 }
 
 
-/**
-  * @brief          pid 输出清除
-  * @param[out]     pid: PID结构数据指针
-  * @retval         none
-  */
+
 void Pid::pid_clear()
 {
     data.last_error = 0;

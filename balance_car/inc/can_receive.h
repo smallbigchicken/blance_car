@@ -29,8 +29,8 @@ typedef struct
 
 class Can_receive {
 public:
-    int serial_fd; // 替换原来的 sock_fd
-    dji_motor_measure_t legs[2];
+    int serial_fd; 
+    dji_motor_measure_t legs[2];//两个电机的反馈数据
 
     Can_receive();
     ~Can_receive();
@@ -38,27 +38,27 @@ public:
     // 初始化：传入设备路径，如 "/dev/ttyACM0"
     bool init(const char* port_name);
 
-    // 获取电机数据指针
+    // 获取电机数据指针，用于Car类初始化
     const dji_motor_measure_t *get_dji_motor_measure_point(uint8_t i);
 
-    // 发送给电机 (生成 SLCAN 字符串并写入串口)
+    // 发送给电机
     void can_cmd_leg_motor(int16_t left_leg, int16_t right_leg, uint16_t ID);
 
-    // 接收一次 (读取串口并解析字符串)
+    // 接收一次 
     void receive_once();
 
 private:
-    std::string rx_buffer_; // <--- 新增：用于缓存未处理完的数据
-    // 内部数据解析回调 (保持不变)
+    std::string rx_buffer_; // 用于缓存未处理完的数据
+    // 内部数据解析回调
     void get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t data[8]);
 
-    // 内部辅助：配置串口
+    // 配置串口
     bool configure_serial();
     
-    // 内部辅助：发送简短的 SLCAN 指令 (如 "S8", "O")
+    // 发送简短的 SLCAN 指令 (如 "S8", "O")
     void send_slcan_cmd(const char* cmd);
     
-    // 内部辅助：16进制字符转数字
+    //16进制字符转数字
     uint8_t hex_char_to_byte(char c);
     uint8_t hex_str_to_byte(const char* str);
 };

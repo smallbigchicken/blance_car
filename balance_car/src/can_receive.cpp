@@ -7,7 +7,7 @@ Can_receive::Can_receive() : serial_fd(-1) {}
 
 Can_receive::~Can_receive() {
     if (serial_fd >= 0) {
-        // 退出前尝试关闭 CAN 通道
+       
         send_slcan_cmd("C");
         close(serial_fd);
     }
@@ -29,7 +29,7 @@ bool Can_receive::configure_serial() {
         return false;
     }
 
-    cfsetospeed(&tty, B115200); // USB虚拟串口通常忽略这个，但设上无妨
+    cfsetospeed(&tty, B115200); 
     cfsetispeed(&tty, B115200);
 
     tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8; 
@@ -54,14 +54,14 @@ bool Can_receive::configure_serial() {
 
 // 初始化函数
 bool Can_receive::init(const char* port_name) {
-    // 1. 打开串口
+    // 打开串口
     serial_fd = open(port_name, O_RDWR | O_NOCTTY | O_SYNC);
     if (serial_fd < 0) {
         std::cerr << "Error opening " << port_name << ": " << strerror(errno) << std::endl;
         return false;
     }
 
-    // 2. 配置串口
+    // 配置串口
     if (!configure_serial()) {
         close(serial_fd);
         return false;
@@ -69,7 +69,7 @@ bool Can_receive::init(const char* port_name) {
 
     std::cout << "Serial Port " << port_name << " Opened. Initializing SLCAN..." << std::endl;
 
-    // 3. SLCAN 初始化序列
+    // SLCAN 初始化序列
     // C = Close (先关闭以防万一)
     send_slcan_cmd("C");
     // S8 = Set bitrate 1M (S6=500k, S8=1M) -> 根据你的电机波特率修改这里！
@@ -80,7 +80,7 @@ bool Can_receive::init(const char* port_name) {
     return true;
 }
 
-// 发送指令 (重写为 SLCAN 字符串格式)
+// 发送指令
 void Can_receive::can_cmd_leg_motor(int16_t left_leg, int16_t right_leg, uint16_t ID) {
     if (serial_fd < 0) return;
 
@@ -140,11 +140,11 @@ void Can_receive::receive_once() {
         // 确保找到了 't' 且长度足够
         if (t_pos != std::string::npos && recv_str.length() >= t_pos + 21) {
             
-            // 1. 解析 ID
+            // 解析 ID
             std::string id_str = recv_str.substr(t_pos + 1, 3);
             uint16_t can_id = std::stoi(id_str, nullptr, 16);
 
-            // 2. 解析数据
+            // 解析数据
             uint8_t data[8] = {0};
             // 确保字符串长度足够容纳数据 (t + 3位ID + 1位长度 + 16位数据)
             // 这里的判断逻辑稍微放宽一点，防止越界
@@ -154,15 +154,9 @@ void Can_receive::receive_once() {
                     data[i] = hex_str_to_byte(data_ptr + i * 2);
                 }
 
-                // // --- [调试打印 2]：打印解析后的 ID 和 Hex 数据 ---
-                // printf(" -> Parsed ID: 0x%03X | Data: ", can_id);
-                // for(int i=0; i<8; i++) {
-                //     printf("%02X ", data[i]);
-                // }
-                // printf("\n");
                 
 
-                // 4. 根据 ID 分发数据
+                // 根据 ID 更新特定的电机数据
                 if (can_id == CAN_LEFT_LEG_MOTOR_ID) {
                     get_dji_motor_measure(&legs[0], data);
                     
@@ -172,14 +166,11 @@ void Can_receive::receive_once() {
                     // std::cout<<"转速"<<legs[1].speed_rpm<<std::endl;
                 }
             }
-        } else {
-            // 如果收到了数据但格式不对 (比如没找到 t)，打印个警告
-            // std::cout << "[Warning] Invalid format or incomplete frame" << std::endl;
-        }
+        } 
     }
 }
 
-// 数据解析回调 (保持原来的逻辑完全不变)
+// 数据解析回调 
 void Can_receive::get_dji_motor_measure(dji_motor_measure_t *dji_motor, uint8_t data[8])
 {
     dji_motor->last_ecd = dji_motor->ecd;
