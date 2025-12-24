@@ -4,7 +4,7 @@ Car::Car(const dji_motor_measure_t *left_motor_ptr,
          const dji_motor_measure_t *right_motor_ptr,
          const fp32 *speed_parm) : left_leg(left_motor_ptr, speed_parm),
                                    right_leg(right_motor_ptr, speed_parm),
-                                    L(0.23)
+                                   L(0.23)
 {
 }
 
@@ -25,8 +25,6 @@ void Car::feedback_update()
 
     left_leg.update();
     right_leg.update();
-
-
 }
 
 // 设定控制目标
@@ -55,11 +53,9 @@ void Car::output()
     // 右轮负电 后退
     // 左轮正电 前进
     can_receive.can_cmd_leg_motor(int(left_leg.current_give), int(right_leg.current_give), CAN_LEGS_ALL_ID);
-
 }
 
-
-//终止函数，发送0信号
+// 终止函数，发送0信号
 void Car::finish()
 {
     can_receive.can_cmd_leg_motor(0, 0, CAN_LEGS_ALL_ID);

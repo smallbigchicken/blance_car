@@ -5,7 +5,7 @@
 #define OLD 1
 #define NEW 2
 
-//限幅
+// 限幅
 #define LimitMax(input, max)   \
     {                          \
         if (input > max)       \
@@ -18,7 +18,7 @@
         }                      \
     }
 
-//初始化PID参数
+// 初始化PID参数
 void Pid::init(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_, fp32 erro_delta_)
 {
     mode = mode_;
@@ -33,11 +33,9 @@ void Pid::init(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_, fp32
     data.ref = ref_;
     data.error = *set_ - *ref_;
 
-    
     if (data.mode == PID_ANGLE)
-         data.error_delta = erro_delta_;
+        data.error_delta = erro_delta_;
 }
-
 
 Pid::Pid(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_)
 {
@@ -48,41 +46,34 @@ Pid::Pid(uint8_t mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_)
     data.kf = pid_parm[3];
     data.max_iout = pid_parm[4];
     data.max_out = pid_parm[5];
-    
+
     data.ref_last = *ref_;
     data.set = set_;
     data.ref = ref_;
     data.error = *set_ - *ref_;
-
 }
 
+// pid计算
+fp32 Pid::pid_calc()
+{
+    data.last_error = data.error;
+    data.error = *data.set - *data.ref;
+    if (mode == PID_SPEED)
+        data.error_delta = data.error - data.last_error;
 
+    data.Pout = data.Kp * data.error;
+    data.Iout += data.Ki * data.error;
+    data.Dout = data.Kd * (data.error_delta);
+    data.Fout = data.kf * (*data.ref - data.ref_last);
 
+    LimitMax(data.Iout, data.max_iout);
 
-//pid计算
- fp32 Pid::pid_calc(){
-     data.last_error = data.error;
-     data.error = *data.set - *data.ref;
-     if (mode == PID_SPEED)
-         data.error_delta = data.error - data.last_error;
-
-
-     data.Pout = data.Kp * data.error;
-     data.Iout += data.Ki * data.error;
-     data.Dout = data.Kd * (data.error_delta);
-     data.Fout = data.kf * (*data.ref - data.ref_last);
-
-     
-     LimitMax(data.Iout, data.max_iout);
-     
     data.ref_last = *data.ref;
-     data.out = data.Pout + data.Iout + data.Dout + data.Fout;
-     LimitMax(data.out, data.max_out);
+    data.out = data.Pout + data.Iout + data.Dout + data.Fout;
+    LimitMax(data.out, data.max_out);
 
-     return data.out;
+    return data.out;
 }
-
-
 
 void Pid::pid_clear()
 {
@@ -90,7 +81,7 @@ void Pid::pid_clear()
     data.error = 0;
     *data.set = 0;
     *data.ref = 0;
-    data.out =  0;
+    data.out = 0;
     data.Pout = 0;
     data.Iout = 0;
     data.Dout = 0;

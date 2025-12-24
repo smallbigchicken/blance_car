@@ -12,8 +12,8 @@
 // 定义 ID 枚举
 typedef enum
 {
-    CAN_LEFT_LEG_MOTOR_ID = 0x201, 
-    CAN_RIGHT_LEG_MOTOR_ID = 0x202, 
+    CAN_LEFT_LEG_MOTOR_ID = 0x201,
+    CAN_RIGHT_LEG_MOTOR_ID = 0x202,
     CAN_LEGS_ALL_ID = 0x200,
 } can_msg_id_e;
 
@@ -27,16 +27,17 @@ typedef struct
     int16_t last_ecd;
 } dji_motor_measure_t;
 
-class Can_receive {
+class Can_receive
+{
 public:
-    int serial_fd; 
-    dji_motor_measure_t legs[2];//两个电机的反馈数据
+    int serial_fd;
+    dji_motor_measure_t legs[2]; // 两个电机的反馈数据
 
     Can_receive();
     ~Can_receive();
 
     // 初始化：传入设备路径，如 "/dev/ttyACM0"
-    bool init(const char* port_name);
+    bool init(const char *port_name);
 
     // 获取电机数据指针，用于Car类初始化
     const dji_motor_measure_t *get_dji_motor_measure_point(uint8_t i);
@@ -44,7 +45,7 @@ public:
     // 发送给电机
     void can_cmd_leg_motor(int16_t left_leg, int16_t right_leg, uint16_t ID);
 
-    // 接收一次 
+    // 接收一次
     void receive_once();
 
 private:
@@ -54,13 +55,13 @@ private:
 
     // 配置串口
     bool configure_serial();
-    
+
     // 发送简短的 SLCAN 指令 (如 "S8", "O")
-    void send_slcan_cmd(const char* cmd);
-    
-    //16进制字符转数字
+    void send_slcan_cmd(const char *cmd);
+
+    // 16进制字符转数字
     uint8_t hex_char_to_byte(char c);
-    uint8_t hex_str_to_byte(const char* str);
+    uint8_t hex_str_to_byte(const char *str);
 };
 
 extern Can_receive can_receive;
